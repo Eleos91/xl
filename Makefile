@@ -1,5 +1,5 @@
 # uncomment next line if you need shadow passwd support
-#NEEDSHADOW= -DNEED_SHADOW
+NEEDSHADOW= -DNEED_SHADOW
 
 X11HOME = /usr/X11R6
 
@@ -18,7 +18,9 @@ OBJS = main.o
 all:	xl
 
 xl: $(OBJS)
-	$(CC) $(CFLAGS) -o xl $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o xl $(OBJS) $(LIBS);
+	sudo chown root:root ./xl;
+	sudo chmod u+s ./xl
 
 clean:
 	rm -f $(OBJS)

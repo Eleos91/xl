@@ -12,6 +12,7 @@
 #include <crypt.h>
 #include <string.h>
 #include <pwd.h>
+#include <sys/types.h>
 
 #ifdef NEED_SHADOW
 #include <shadow.h>
@@ -25,6 +26,7 @@ main(int argc, char *argv[])
     int len = 0, i;
     XEvent ev;
     char keybuffer[1024], *passwd;
+    uid_t current_uid = getuid();
 
     if (argc > 1) {
 	setenv("XLPASSWD", argv[1], 1);
@@ -36,7 +38,8 @@ main(int argc, char *argv[])
 	passwd = strdup(crypt(passwd, "ax"));
     else {
 #ifndef NEED_SHADOW
-	passwd = getpwuid(getuid())->pw_passwd;
+  setuid(1);
+	passwd = getpwuid(current_uid)->pw_passwd;
 #else
 	{
 	    struct spwd *sp = getspnam(getpwuid(getuid())->pw_name);
@@ -46,6 +49,7 @@ main(int argc, char *argv[])
 		fprintf(stderr, "could not get shadow entry\n");
 		exit(1);
 	    }
+      setuid(current_uid);
 	}
 #endif
 	if (!passwd) {
